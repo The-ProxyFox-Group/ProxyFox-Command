@@ -3,7 +3,6 @@ package dev.proxyfox.command.api.node
 import dev.proxyfox.command.api.CommandContext
 
 public abstract class CommandNode<T, C: CommandContext<T>> {
-
     /**
      * The priority of the node
      * */
