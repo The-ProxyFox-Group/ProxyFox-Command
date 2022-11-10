@@ -5,7 +5,7 @@ import dev.proxyfox.command.api.CommandContext
 public abstract class CommandNode<T, C: CommandContext<T>> {
 
     /**
-     * The priority of the node, higher number = higher priority
+     * The priority of the node
      * */
     public abstract val priority: Priority
 
