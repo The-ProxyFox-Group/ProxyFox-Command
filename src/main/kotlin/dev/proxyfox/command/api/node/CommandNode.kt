@@ -7,7 +7,7 @@ public abstract class CommandNode<T, C: CommandContext<T>> {
     /**
      * The priority of the node, higher number = higher priority
      * */
-    public abstract val priority: Int
+    public abstract val priority: Priority
 
     private val subNodes = ArrayList<CommandNode<T, C>>()
 
@@ -24,7 +24,7 @@ public abstract class CommandNode<T, C: CommandContext<T>> {
     public fun <N: CommandNode<T,C>> addSubNode(node: N) {
         subNodes.add(node)
         subNodes.sortBy {
-            -it.priority
+            it.priority.value
         }
     }
 }
