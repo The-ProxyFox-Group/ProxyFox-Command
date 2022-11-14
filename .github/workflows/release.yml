@@ -23,5 +23,5 @@ jobs:
         with:
           arguments: build publish
         env:
-          PF_MAVEN_USERNAME: ${{ secrets.PF_MAVEN_USER }}
-          PF_MAVEN_PASSWORD: ${{ secrets.PF_MAVEN_PASS }}
+          PF_MAVEN_USER: ${{ secrets.PF_MAVEN_USER }}
+          PF_MAVEN_PASS: ${{ secrets.PF_MAVEN_PASS }}
