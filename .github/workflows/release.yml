@@ -1,0 +1,27 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    branches:
+      - "main"
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+      - uses: actions/checkout@v3
+      - run: chmod +x ./gradlew
+
+      - name: Build Artifacts
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build publish
+        env:
+          PF_MAVEN_USERNAME: ${{ secrets.PF_MAVEN_USER }}
+          PF_MAVEN_PASSWORD: ${{ secrets.PF_MAVEN_PASS }}
