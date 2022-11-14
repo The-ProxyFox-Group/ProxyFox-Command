@@ -30,10 +30,8 @@ publishing {
     repositories {
         maven {
             url = uri("https://maven.proxyfox.dev")
-            credentials {
-                username = System.getenv("PF_MAVEN_USER")
-                password = System.getenv("PF_MAVEN_PASS")
-            }
+            credentials.username = System.getenv("PF_MAVEN_USER")
+            credentials.password = System.getenv("PF_MAVEN_PASS")
         }
     }
 }
