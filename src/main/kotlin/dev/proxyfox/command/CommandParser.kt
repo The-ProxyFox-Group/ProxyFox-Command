@@ -14,7 +14,7 @@ public class CommandParser<T, C: CommandContext<T>>: NodeHolder<T, C>() {
     private suspend fun tryParseNode(input: String, node: CommandNode<T, C>, ctx: C): Boolean? {
         val idx = node.parse(input, ctx)
         if (idx == -1) return null
-        if (idx >= input.length) return node.execute(ctx)
+        if (idx > input.length) return node.execute(ctx)
         val substr = input.substring(idx).trim()
         for (subNode in node.nodes) {
             val output = tryParseNode(substr, subNode, ctx)

@@ -7,6 +7,10 @@ suspend fun main() {
     val parser = CommandParser<String, StringContext>()
 
     parser.literal("test") {
+        executes {
+            respondPlain("It didn't work.")
+            false
+        }
         literal("int") {
             int("someInt") {
                 executes {
@@ -64,6 +68,21 @@ suspend fun main() {
                 }
             }
         }
+
+        literal("zw") {
+            zw("test") {
+                executes {
+                    respondSuccess("It worked!")
+                    true
+                }
+                literal("owo") {
+                    executes {
+                        respondSuccess("Ran in zw!")
+                        true
+                    }
+                }
+            }
+        }
     }
     println("testing unixLiteral")
     parser.parse(StringContext("test unixliteral -test"))
@@ -77,4 +96,8 @@ suspend fun main() {
     parser.parse(StringContext("test stringlist owo uwu"))
     println("testing greedy")
     parser.parse(StringContext("test greedy owo owo uwu"))
+    println("testing zero width")
+    parser.parse(StringContext("test zw"))
+    parser.parse(StringContext("test zw owo"))
+
 }
