@@ -28,16 +28,16 @@ class StringContext(override val value: String): CommandContext<String>() {
 
     override suspend fun timedYesNoPrompt(
         text: String,
-        yesAction: Executor<String>,
-        noAction: Executor<String>,
+        yesAction: Pair<String, Executor<String>>,
+        noAction: Pair<String, Executor<String>>,
         timeoutAction: Executor<String>,
         private: Boolean
     ) {
         print("$text [y/n]: ")
         val line = readln()
         when (line.trim().lowercase()) {
-            "y", "yes" -> yesAction()
-            "n", "no" -> noAction()
+            "y", "yes" -> yesAction.second(this)
+            "n", "no" -> noAction.second(this)
             else -> timeoutAction()
         }
     }

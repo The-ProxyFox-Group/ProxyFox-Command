@@ -47,5 +47,11 @@ public abstract class CommandContext<T> {
     /**
      * A timed yes/no prompt
      * */
-    public abstract suspend fun timedYesNoPrompt(text: String, yesAction: Executor<T>, noAction: Executor<T>, timeoutAction: Executor<T>, private: Boolean = false)
+    public abstract suspend fun timedYesNoPrompt(
+        text: String,
+        yesAction: Pair<String, Executor<T>>,
+        noAction: Pair<String, Executor<T>>,
+        timeoutAction: Executor<T>,
+        private: Boolean = false
+    )
 }
