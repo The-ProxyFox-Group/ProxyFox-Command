@@ -11,7 +11,7 @@ public class UnixNode<T, C: CommandContext<T>>(override val name: String): Comma
     override val priority: Priority = Priority.SEMI_STATIC
 
     override fun parse(str: String, ctx: C): Int {
-        if (str.isEmpty()) return 0
+        if (str.isEmpty()) return -1
         var idx = 0
         val arr = ArrayList<String>()
         while (idx < str.length) {
@@ -35,6 +35,7 @@ public class UnixNode<T, C: CommandContext<T>>(override val name: String): Comma
             arr.add(out)
             idx += out.length
         }
+        if (arr.isEmpty()) return -1
         ctx[name] = arr
         return idx
     }
