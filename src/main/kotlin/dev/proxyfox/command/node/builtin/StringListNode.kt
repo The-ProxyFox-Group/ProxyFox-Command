@@ -5,7 +5,6 @@ import dev.proxyfox.command.NodeActionParam
 import dev.proxyfox.command.NodeHolder
 import dev.proxyfox.command.node.CommandNode
 import dev.proxyfox.command.node.Priority
-import java.lang.NullPointerException
 
 public class StringListNode<T, C: CommandContext<T>>(override val name: String): CommandNode<T, C>() {
     override val priority: Priority = Priority.GREEDY
@@ -15,50 +14,58 @@ public class StringListNode<T, C: CommandContext<T>>(override val name: String):
         var i = 0
         val arr = ArrayList<String>()
         while (i < str.length) {
+            if (str[i] == ' ') {
+                i++
+                continue
+            }
             when (str[i]) {
                 '"' -> {
                     var out = ""
-                    for (j in str.substring(1).indices) {
-                        if (str[j] == '"') {
-                            arr.add(out)
-                            out = ""
-                            i += j + 1
-                            continue
-                        }
-                        out += str[j].toString()
+                    val substr = str.substring(i + 1)
+                    for (j in substr.indices) {
+                        if (substr[j] == '"')
+                            break
+                        out += substr[j].toString()
                     }
-                    arr.add(out)
+                    if (out.isNotEmpty()) {
+                        arr.add(out)
+                        i += out.length + 2
+                        continue
+                    }
+                    if (out.isNotEmpty()) arr.add(out)
                 }
 
                 '\'' -> {
                     var out = ""
-                    for (j in str.substring(1).indices) {
-                        if (str[j] == '\'') {
-                            arr.add(out)
-                            out = ""
-                            i += j + 1
-                            continue
-                        }
-                        out += str[j].toString()
+                    val substr = str.substring(i + 1)
+                    for (j in substr.indices) {
+                        if (substr[j] == '\'')
+                            break
+                        out += substr[j].toString()
                     }
-                    arr.add(out)
+                    if (out.isNotEmpty()) {
+                        arr.add(out)
+                        i += out.length + 2
+                        continue
+                    }
                 }
 
                 else -> {
                     var out = ""
-                    for (j in str.indices) {
-                        if (str[j] == ' ') {
-                            arr.add(out)
-                            out = ""
-                            i += j
-                            continue
-                        }
-                        out += str[j].toString()
+                    val substr = str.substring(i)
+                    for (j in substr.indices) {
+                        if (substr[j] == ' ')
+                            break
+                        out += substr[j].toString()
                     }
-                    arr.add(out)
+                    if (out.isNotEmpty()) {
+                        arr.add(out)
+                        i += out.length
+                        continue
+                    }
                 }
             }
-            i = str.length
+            i++
         }
         ctx[name] = arr
         return str.length
