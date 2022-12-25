@@ -13,7 +13,7 @@ public class CommandParser<T, C: CommandContext<T>>: NodeHolder<T, C>() {
         val test = ctx.command.split(" ")[0]
         val closest = getLevenshtein(test, literals) ?: return null
         if (closest.second == 0) return null
-        ctx.respondFailure("Command `$test` not found. Did you mean `${closest.first}`?")
+        ctx.respondFailure("Command `$test` not found. Did you mean `${closest.first}`? Closeness: ${closest.second}")
         return false
     }
 
