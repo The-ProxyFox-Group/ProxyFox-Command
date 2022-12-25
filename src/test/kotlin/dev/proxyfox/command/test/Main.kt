@@ -1,6 +1,7 @@
 package dev.proxyfox.command.test
 
 import dev.proxyfox.command.CommandParser
+import dev.proxyfox.command.levenshtein
 import dev.proxyfox.command.node.builtin.*
 
 suspend fun main() {
@@ -99,5 +100,6 @@ suspend fun main() {
     println("testing zero width")
     parser.parse(StringContext("test zw"))
     parser.parse(StringContext("test zw owo"))
-
+    println("testing levenshtein distance")
+    parser.parse(StringContext("twst"))
 }

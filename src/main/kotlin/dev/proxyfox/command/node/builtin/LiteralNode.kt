@@ -7,7 +7,13 @@ import dev.proxyfox.command.node.Priority
 import dev.proxyfox.command.NodeHolder
 
 
-public class LiteralNode<T, C: CommandContext<T>>(private val literals: Array<out String>): CommandNode<T, C>() {
+public class LiteralNode<T, C: CommandContext<T>>(public val literals: Array<out String>): CommandNode<T, C>() {
+    init {
+        for (literal in literals)
+            if (literal.contains(" "))
+                throw IllegalArgumentException("Literal `$literal` contains a space!")
+    }
+
     override val priority: Priority = Priority.STATIC
     override val name: String = ""
 
