@@ -1,5 +1,7 @@
 package dev.proxyfox.command
 
+import dev.proxyfox.command.menu.CommandButton
+import dev.proxyfox.command.menu.CommandScreen
 import dev.proxyfox.command.node.CommandNode
 import kotlin.math.min
 
@@ -10,6 +12,9 @@ public typealias NodeActionParam<T, C, V> = suspend CommandNode<T, C>.(ParamGett
 public typealias NodeAction<T, C> = suspend CommandNode<T, C>.() -> Unit
 
 public typealias ParamGetter<T, V> = suspend CommandContext<T>.() -> V
+
+public typealias ScreenBuilder<T, C> = CommandScreen<T, C>.(ctx: C) -> Unit
+public typealias ButtonBuilder<T, C> = CommandButton<T, C>.(ctx: C) -> Unit
 
 /**
  * Levenshtein Distance algorithm
