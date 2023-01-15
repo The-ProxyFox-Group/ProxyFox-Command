@@ -1,7 +1,7 @@
 package dev.proxyfox.command.test
 
 import dev.proxyfox.command.CommandContext
-import dev.proxyfox.command.Executor
+import dev.proxyfox.command.MenuBuilder
 
 class StringContext(override val value: String): CommandContext<String>() {
     override val command: String = value
@@ -26,19 +26,9 @@ class StringContext(override val value: String): CommandContext<String>() {
         return text
     }
 
-    override suspend fun timedYesNoPrompt(
-        text: String,
-        yesAction: Pair<String, Executor<String>>,
-        noAction: Pair<String, Executor<String>>,
-        timeoutAction: Executor<String>,
-        private: Boolean
-    ) {
-        print("$text [y/n]: ")
-        val line = readln()
-        when (line.trim().lowercase()) {
-            "y", "yes" -> yesAction.second(this)
-            "n", "no" -> noAction.second(this)
-            else -> timeoutAction()
-        }
+    override suspend fun menu(action: MenuBuilder) {
+        val menu = TerminalMenu()
+        menu.action()
+        menu.init()
     }
 }
