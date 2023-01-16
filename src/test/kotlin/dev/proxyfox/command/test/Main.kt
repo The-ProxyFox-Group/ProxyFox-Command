@@ -88,16 +88,16 @@ suspend fun main() {
         literal("menu") {
             executes {
                 menu {
-                    default("owo") {
-                        button("someButton") {
-                            println("Button pressed!")
-                            screen = "other"
-                        }
-                    }
-                    "other" {
+                    val other = "other" {
                         button("someOtherButton") {
                             println("Yay!")
                             close()
+                        }
+                    }
+                    default("owo") {
+                        button("someButton") {
+                            println("Button pressed!")
+                            screen = other
                         }
                     }
                 }

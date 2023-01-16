@@ -4,7 +4,7 @@ import dev.proxyfox.command.menu.CommandMenu
 import dev.proxyfox.command.menu.CommandScreen
 
 class TerminalMenu : CommandMenu() {
-    var closed = false
+    private var closed = false
 
     override fun createScreen(name: String): CommandScreen {
         return TerminalScreen(name, this)
