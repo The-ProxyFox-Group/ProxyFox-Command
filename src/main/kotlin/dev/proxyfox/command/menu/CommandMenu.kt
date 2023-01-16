@@ -23,10 +23,11 @@ public abstract class CommandMenu {
 
     internal fun setScreen(screen: CommandScreen) {
         active = screen
+        screen.init()
     }
 
     public open fun init() {
-        active = default
+        setScreen(default ?: return)
     }
 
     public abstract fun createScreen(name: String): CommandScreen
