@@ -1,5 +1,7 @@
 package dev.proxyfox.command
 
+import dev.proxyfox.command.menu.CommandMenu
+
 public abstract class CommandContext<T> {
     /**
      * The command trigger for the context
@@ -44,14 +46,5 @@ public abstract class CommandContext<T> {
      * */
     public abstract suspend fun respondWarning(text: String, private: Boolean = false): T
 
-    /**
-     * A timed yes/no prompt
-     * */
-    public abstract suspend fun timedYesNoPrompt(
-        text: String,
-        yesAction: Pair<String, Executor<T>>,
-        noAction: Pair<String, Executor<T>>,
-        timeoutAction: Executor<T>,
-        private: Boolean = false
-    )
+    public abstract suspend fun menu(action: MenuBuilder)
 }
