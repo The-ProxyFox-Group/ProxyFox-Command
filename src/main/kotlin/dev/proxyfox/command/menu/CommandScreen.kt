@@ -1,18 +1,17 @@
 package dev.proxyfox.command.menu
 
-import dev.proxyfox.command.ButtonBuilder
-import dev.proxyfox.command.CommandContext
+import dev.proxyfox.command.ButtonAction
 
-public abstract class CommandScreen(public val name: String, internal val menu: CommandMenu) {
-    internal val buttons: HashMap<String, ButtonBuilder> = hashMapOf()
+public abstract class CommandScreen(public val name: String) {
+    internal val buttons: HashMap<String, ButtonAction> = hashMapOf()
 
-    public fun button(name: String, action: ButtonBuilder) {
+    public open suspend fun button(name: String, action: ButtonAction) {
         buttons[name] = action
     }
 
-    public fun click(name: String) {
-        buttons[name]!!(CommandButton(this))
+    public open suspend fun click(name: String) {
+        buttons[name]!!()
     }
 
-    public abstract fun init()
+    public abstract suspend fun init()
 }

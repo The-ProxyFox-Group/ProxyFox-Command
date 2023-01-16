@@ -97,7 +97,7 @@ suspend fun main() {
                     default("owo") {
                         button("someButton") {
                             println("Button pressed!")
-                            screen = other
+                            setScreen(other)
                         }
                     }
                 }
