@@ -16,6 +16,9 @@ kotlin {
     explicitApi()
 }
 
+dependencies {
+}
+
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "18"
 }

@@ -84,6 +84,26 @@ suspend fun main() {
                 }
             }
         }
+
+        literal("menu") {
+            executes {
+                menu {
+                    val other = "other" {
+                        button("someOtherButton") {
+                            println("Yay!")
+                            close()
+                        }
+                    }
+                    default("owo") {
+                        button("someButton") {
+                            println("Button pressed!")
+                            screen = other
+                        }
+                    }
+                }
+                true
+            }
+        }
     }
     println("testing unixLiteral")
     parser.parse(StringContext("test unixliteral -test"))
@@ -100,6 +120,8 @@ suspend fun main() {
     println("testing zero width")
     parser.parse(StringContext("test zw"))
     parser.parse(StringContext("test zw owo"))
+    println("testing menu")
+    parser.parse(StringContext("test menu"))
     println("testing levenshtein distance")
     parser.parse(StringContext("twst"))
 }
