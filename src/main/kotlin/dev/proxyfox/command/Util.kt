@@ -1,6 +1,5 @@
 package dev.proxyfox.command
 
-import dev.proxyfox.command.menu.CommandButton
 import dev.proxyfox.command.menu.CommandMenu
 import dev.proxyfox.command.menu.CommandScreen
 import dev.proxyfox.command.node.CommandNode
@@ -14,9 +13,9 @@ public typealias NodeAction<T, C> = suspend CommandNode<T, C>.() -> Unit
 
 public typealias ParamGetter<T, V> = suspend CommandContext<T>.() -> V
 
-public typealias MenuBuilder = CommandMenu.() -> Unit
-public typealias ScreenBuilder = CommandScreen.() -> Unit
-public typealias ButtonBuilder = CommandButton.() -> Unit
+public typealias MenuBuilder = suspend CommandMenu.() -> Unit
+public typealias ScreenBuilder = suspend CommandScreen.() -> Unit
+public typealias ButtonAction = suspend () -> Unit
 
 /**
  * Levenshtein Distance algorithm

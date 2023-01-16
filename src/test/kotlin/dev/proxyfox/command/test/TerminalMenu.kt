@@ -6,15 +6,15 @@ import dev.proxyfox.command.menu.CommandScreen
 class TerminalMenu : CommandMenu() {
     private var closed = false
 
-    override fun createScreen(name: String): CommandScreen {
+    override suspend fun createScreen(name: String): CommandScreen {
         return TerminalScreen(name, this)
     }
 
-    override fun close() {
+    override suspend fun close() {
         closed = true
     }
 
-    override fun init() {
+    override suspend fun init() {
         super.init()
         while (!closed) {
             val line = readln()
@@ -26,8 +26,8 @@ class TerminalMenu : CommandMenu() {
 class TerminalScreen(
     name: String,
     menu: CommandMenu
-) : CommandScreen(name, menu) {
-    override fun init() {
+) : CommandScreen(name) {
+    override suspend fun init() {
         println("Options in $name:")
         for (button in buttons.keys) {
             println("  $button")

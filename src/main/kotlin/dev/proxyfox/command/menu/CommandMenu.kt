@@ -6,14 +6,14 @@ public abstract class CommandMenu {
     private var default: CommandScreen? = null
     public var active: CommandScreen? = null
 
-    public fun default(name: String = "default", action: ScreenBuilder): CommandScreen {
+    public open suspend fun default(name: String = "default", action: ScreenBuilder): CommandScreen {
         val screen = createScreen(name)
         screen.action()
         default = screen
         return screen
     }
 
-    public operator fun String.invoke(action: ScreenBuilder): CommandScreen {
+    public open suspend operator fun String.invoke(action: ScreenBuilder): CommandScreen {
         val screen = createScreen(this)
         screen.action()
         if (default == null)
@@ -21,16 +21,16 @@ public abstract class CommandMenu {
         return screen
     }
 
-    internal fun setScreen(screen: CommandScreen) {
+    public open suspend fun setScreen(screen: CommandScreen) {
         active = screen
         screen.init()
     }
 
-    public open fun init() {
+    public open suspend fun init() {
         setScreen(default ?: return)
     }
 
-    public abstract fun createScreen(name: String): CommandScreen
+    public abstract suspend fun createScreen(name: String): CommandScreen
 
-    public abstract fun close()
+    public abstract suspend fun close()
 }
