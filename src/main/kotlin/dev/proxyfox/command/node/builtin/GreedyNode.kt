@@ -11,9 +11,9 @@ import java.lang.NullPointerException
 public class GreedyNode<T, C: CommandContext<T>>(override val name: String): CommandNode<T, C>() {
     override val priority: Priority = Priority.GREEDY
 
-    override fun parse(str: StringCursor, ctx: C): Boolean {
-        if (str.end) return false
-        ctx[name] = str.seekToEnd()
+    override fun parse(cursor: StringCursor, ctx: C): Boolean {
+        if (cursor.end) return false
+        ctx[name] = cursor.seekToEnd()
         return true
     }
 }
