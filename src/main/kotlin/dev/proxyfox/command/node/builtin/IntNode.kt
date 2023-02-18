@@ -3,6 +3,7 @@ package dev.proxyfox.command.node.builtin
 import dev.proxyfox.command.CommandContext
 import dev.proxyfox.command.NodeActionParam
 import dev.proxyfox.command.NodeHolder
+import dev.proxyfox.command.StringCursor
 import dev.proxyfox.command.node.CommandNode
 import dev.proxyfox.command.node.Priority
 import java.lang.NullPointerException
@@ -10,18 +11,11 @@ import java.lang.NullPointerException
 public class IntNode<T, C: CommandContext<T>>(override val name: String): CommandNode<T, C>() {
     override val priority: Priority = Priority.SEMI_STATIC
 
-    override fun parse(str: String, ctx: C): Int {
-        if (str.isEmpty()) return -1
-        var out = ""
-        for (i in str.indices) {
-            if (str[i] == ' ') {
-                ctx[name] = out.toULongOrNull() ?: return -1
-                return i
-            }
-            out += str[i].toString()
-        }
-        ctx[name] = out.toULongOrNull() ?: return -1
-        return str.length
+    override fun parse(cursor: StringCursor, ctx: C): Boolean {
+        if (cursor.end) return false
+        ctx[name] = cursor.extractString(true).toULongOrNull() ?: return false
+        cursor.inc()
+        return true
     }
 }
 

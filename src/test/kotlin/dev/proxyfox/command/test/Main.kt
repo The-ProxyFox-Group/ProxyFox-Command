@@ -1,7 +1,6 @@
 package dev.proxyfox.command.test
 
 import dev.proxyfox.command.CommandParser
-import dev.proxyfox.command.levenshtein
 import dev.proxyfox.command.node.builtin.*
 
 suspend fun main() {
