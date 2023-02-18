@@ -3,6 +3,7 @@ package dev.proxyfox.command.node
 import dev.proxyfox.command.CommandContext
 import dev.proxyfox.command.Executor
 import dev.proxyfox.command.NodeHolder
+import dev.proxyfox.command.StringCursor
 
 public abstract class CommandNode<T, C: CommandContext<T>>: NodeHolder<T, C>() {
     /**
@@ -16,11 +17,11 @@ public abstract class CommandNode<T, C: CommandContext<T>>: NodeHolder<T, C>() {
 
     /**
      * Parses the node
-     * @param str The string, trimmed to the current index for parsing
+     * @param cursor The cursor, at the current index
      * @param ctx The command context
-     * @return The new index, return -1 if parsing doesn't succeed
+     * @return Whether the parsing succeeded
      * */
-    public abstract fun parse(str: String, ctx: C): Int
+    public abstract fun parse(cursor: StringCursor, ctx: C): Boolean
 
     public fun executes(executor: Executor<T>) {
         this.executor = executor

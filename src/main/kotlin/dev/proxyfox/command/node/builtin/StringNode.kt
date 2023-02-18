@@ -8,46 +8,11 @@ import java.lang.NullPointerException
 public class StringNode<T, C: CommandContext<T>>(override val name: String): CommandNode<T, C>() {
     override val priority: Priority = Priority.VARIABLE
 
-    override fun parse(str: String, ctx: C): Int {
-        if (str.isEmpty()) return -1
-        when (str[0]) {
-            '"' -> {
-                var out = ""
-                for (i in str.substring(1).indices) {
-                    if (str[i+1] == '"') {
-                        ctx[name] = out
-                        return i + 2
-                    }
-                    out += str[i+1].toString()
-                }
-                ctx[name] = out
-            }
-
-            '\'' -> {
-                var out = ""
-                for (i in str.substring(1).indices) {
-                    if (str[i+1] == '\'') {
-                        ctx[name] = out
-                        return i + 2
-                    }
-                    out += str[i+1].toString()
-                }
-                ctx[name] = out
-            }
-
-            else -> {
-                var out = ""
-                for (i in str.indices) {
-                    if (str[i] == ' ') {
-                        ctx[name] = out
-                        return i
-                    }
-                    out += str[i].toString()
-                }
-                ctx[name] = out
-            }
-        }
-        return str.length
+    override fun parse(cursor: StringCursor, ctx: C): Boolean {
+        if (cursor.end) return false
+        ctx[name] = cursor.extractString(true)
+        cursor.inc()
+        return true
     }
 }
 

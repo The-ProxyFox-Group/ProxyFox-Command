@@ -5,6 +5,7 @@ import dev.proxyfox.command.NodeAction
 import dev.proxyfox.command.node.CommandNode
 import dev.proxyfox.command.node.Priority
 import dev.proxyfox.command.NodeHolder
+import dev.proxyfox.command.StringCursor
 
 
 public class LiteralNode<T, C: CommandContext<T>>(public val literals: Array<out String>): CommandNode<T, C>() {
@@ -17,15 +18,13 @@ public class LiteralNode<T, C: CommandContext<T>>(public val literals: Array<out
     override val priority: Priority = Priority.STATIC
     override val name: String = ""
 
-    override fun parse(str: String, ctx: C): Int {
+    override fun parse(cursor: StringCursor, ctx: C): Boolean {
+        val str = cursor.extractString(false)
+        cursor.inc()
         for (literal in literals) {
-            if (str.length < literal.length) continue
-            if (str.length == literal.length && str.lowercase() == literal.lowercase())
-                return literal.length
-            if (str.length > literal.length && str.lowercase().startsWith(literal.lowercase() + " "))
-                return literal.length
+            if (literal.lowercase() == str.lowercase()) return true
         }
-        return -1
+        return false
     }
 }
 
