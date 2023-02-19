@@ -6,9 +6,17 @@ import dev.proxyfox.command.node.builtin.LiteralNode
 public class CommandParser<T, C: CommandContext<T>>: NodeHolder<T, C>() {
     public suspend fun parse(ctx: C): Boolean? {
         val literals = ArrayList<LiteralNode<T, C>>()
+        val cursor = StringCursor(ctx.command)
         for (node in nodes) {
             if (node is LiteralNode) literals.add(node)
-            return tryParseNode(ctx.command, node, ctx) ?: continue
+            cursor.checkout()
+            val parsed = tryParseNode(cursor, node, ctx)
+            if (parsed == null) {
+                cursor.rollback()
+                continue
+            }
+            cursor.commit()
+            return parsed
         }
         val test = ctx.command.split(" ")[0]
         val closest = getLevenshtein(test, literals) ?: return null
@@ -17,20 +25,26 @@ public class CommandParser<T, C: CommandContext<T>>: NodeHolder<T, C>() {
         return false
     }
 
-    private suspend fun tryParseNode(input: String, node: CommandNode<T, C>, ctx: C): Boolean? {
+    private suspend fun tryParseNode(cursor: StringCursor, node: CommandNode<T, C>, ctx: C): Boolean? {
         // Try parsing the node
-        val idx = node.parse(input, ctx)
+        val parsed = node.parse(cursor, ctx)
         // Return if parsing failed or there's no string left to consume
-        if (idx == -1) return null
-        if (idx >= input.length) return node.execute(ctx)
+        if (!parsed) return null
         // Iterate through sub nodes and try parsing them
-        val substr = input.substring(idx).trim()
         val literals = ArrayList<LiteralNode<T, C>>()
         for (subNode in node.nodes) {
             if (subNode is LiteralNode) literals.add(subNode)
-            return tryParseNode(substr, subNode, ctx) ?: continue
+            cursor.checkout()
+            val parsed = tryParseNode(cursor, subNode, ctx)
+            if (parsed == null) {
+                cursor.rollback()
+                continue
+            }
+            cursor.commit()
+            return parsed
         }
-        val test = substr.split(" ")[0]
+        if (cursor.end) return node.execute(ctx)
+        val test = cursor.extractString(allowQuotes = false)
         val closest = getLevenshtein(test, literals) ?: return node.execute(ctx)
         if (closest.second == 0) return node.execute(ctx)
         ctx.respondFailure("Command `$test` not found. Did you mean `${closest.first}`?")
