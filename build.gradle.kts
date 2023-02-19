@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.7.21"
+    kotlin("jvm") version "1.8.10"
     `maven-publish`
 }
 
 group = "dev.proxyfox"
-version = "1.7"
+version = "1.8"
 
 repositories {
     mavenCentral()
