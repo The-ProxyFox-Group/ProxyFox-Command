@@ -1,7 +1,5 @@
 package dev.proxyfox.command
 
-import dev.proxyfox.command.menu.CommandMenu
-
 public abstract class CommandContext<T> {
     /**
      * The command trigger for the context

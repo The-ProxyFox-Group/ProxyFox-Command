@@ -2,14 +2,9 @@ package dev.proxyfox.command
 
 import dev.proxyfox.command.menu.CommandMenu
 import dev.proxyfox.command.menu.CommandScreen
-import dev.proxyfox.command.node.CommandNode
 import kotlin.math.min
 
 public typealias Executor<T> = suspend CommandContext<T>.() -> Boolean
-
-public typealias NodeActionParam<T, C, V> = suspend CommandNode<T, C>.(ParamGetter<T, V>) -> Unit
-
-public typealias NodeAction<T, C> = suspend CommandNode<T, C>.() -> Unit
 
 public typealias ParamGetter<T, V> = suspend CommandContext<T>.() -> V
 
