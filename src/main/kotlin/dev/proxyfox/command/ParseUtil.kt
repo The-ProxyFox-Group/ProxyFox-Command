@@ -12,13 +12,11 @@ public data class ParseError(
     public val function: KFunction<Any>,
     public val ordinal: Int,
     public val parameter: KParameter?,
-    public val rootliteral: LiteralArgument?,
-    public val validationException: CommandValidationException?
+    public val rootLiteral: LiteralArgument?,
+    public val exception: CommandDecodingException?
 ) {
     override fun toString(): String =
-        if (parameter != null)
-            "${function.name}[$ordinal]:${parameter.name}${validationException?.let { " -> ${it.reason}" } ?: ""}"
-        else "${function.name}[$ordinal]"
+        "${rootLiteral?.values?.let { "$it " } ?: ""}${function.name}[$ordinal]${parameter?.name.let {": $it"} ?: ""}${exception?.let { " -> ${it.reason}" } ?: ""}"
 
     public companion object {
         public const val NOT_COMMAND: Int = -2
@@ -75,9 +73,7 @@ public suspend fun <T, F: KFunction<R>, R> F.parseFunc(context: CommandContext<T
         } catch (err: CommandDecodingException) {
             if (parameter.isOptional || parameter.type.isMarkedNullable)
                 null
-            else return ParseError(this as KFunction<Any>, i, parameter, rootLiteral, null).right()
-        } catch (err: CommandValidationException) {
-            return ParseError(this as KFunction<Any>, i, parameter, rootLiteral, err).right()
+            else return ParseError(this as KFunction<Any>, i, parameter, rootLiteral, err).right()
         }
         map[parameter] = value
         if (value != null)
