@@ -11,7 +11,11 @@ import kotlinx.serialization.serializer
 
 @JvmInline
 @Serializable(with = UnixListSerializer::class)
-public value class UnixList(public val list: List<String>)
+public value class UnixList(public val list: List<String>) {
+    override fun toString(): String {
+        return list.toString()
+    }
+}
 
 private class UnixListSerializer : CommandSerializer<UnixList> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("UnixList", PrimitiveKind.STRING)

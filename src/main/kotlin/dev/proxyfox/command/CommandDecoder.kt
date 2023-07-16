@@ -20,15 +20,15 @@ public class CommandDecoder(public val cursor: StringCursor, public val context:
 
     override val serializersModule: SerializersModule = EmptySerializersModule()
 
+    public fun fails(): Nothing = throw CommandDecodingException(cursor.index)
+
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
         if (elementsCount == descriptor.elementsCount) return CompositeDecoder.DECODE_DONE
         return elementsCount++
     }
 
     override fun decodeString(): String {
-        if (cursor.end) {
-            throw CommandDecodingException(cursor.index)
-        }
+        if (cursor.end) fails()
         val string = cursor.extractString(true)
         cursor.inc()
         return string
@@ -39,7 +39,7 @@ public class CommandDecoder(public val cursor: StringCursor, public val context:
         val string = decodeString()
         if (string.length != 1) {
             cursor.rollback()
-            throw CommandDecodingException(cursor.index)
+            fails()
         }
         cursor.commit()
         return string[0]
@@ -51,7 +51,7 @@ public class CommandDecoder(public val cursor: StringCursor, public val context:
         cursor.inc()
         if (string != "true" && string != "false"){
             cursor.rollback()
-            throw CommandDecodingException(cursor.index)
+            fails()
         }
         cursor.commit()
         return string == "true"
@@ -63,7 +63,7 @@ public class CommandDecoder(public val cursor: StringCursor, public val context:
         cursor.inc()
         if (num == null) {
             cursor.rollback()
-            throw CommandDecodingException(cursor.index)
+            fails()
         }
         cursor.commit()
         return num
@@ -75,7 +75,7 @@ public class CommandDecoder(public val cursor: StringCursor, public val context:
         cursor.inc()
         if (num == null) {
             cursor.rollback()
-            throw CommandDecodingException(cursor.index)
+            fails()
         }
         cursor.commit()
         return num
@@ -87,7 +87,7 @@ public class CommandDecoder(public val cursor: StringCursor, public val context:
         cursor.inc()
         if (num == null) {
             cursor.rollback()
-            throw CommandDecodingException(cursor.index)
+            fails()
         }
         cursor.commit()
         return num
@@ -99,7 +99,7 @@ public class CommandDecoder(public val cursor: StringCursor, public val context:
         cursor.inc()
         if (num == null) {
             cursor.rollback()
-            throw CommandDecodingException(cursor.index)
+            fails()
         }
         cursor.commit()
         return num
@@ -111,7 +111,7 @@ public class CommandDecoder(public val cursor: StringCursor, public val context:
         cursor.inc()
         if (num == null) {
             cursor.rollback()
-            throw CommandDecodingException(cursor.index)
+            fails()
         }
         cursor.commit()
         return num
@@ -123,7 +123,7 @@ public class CommandDecoder(public val cursor: StringCursor, public val context:
         cursor.inc()
         if (num == null) {
             cursor.rollback()
-            throw CommandDecodingException(cursor.index)
+            fails()
         }
         cursor.commit()
         return num
@@ -134,7 +134,7 @@ public class CommandDecoder(public val cursor: StringCursor, public val context:
         val idx = enumDescriptor.getElementIndex(decodeString())
         if (idx == UNKNOWN_NAME) {
             cursor.rollback()
-            throw CommandDecodingException(cursor.index)
+            fails()
         }
         cursor.commit()
         return idx

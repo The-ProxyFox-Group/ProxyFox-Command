@@ -11,7 +11,11 @@ import kotlinx.serialization.encoding.Encoder
 
 @JvmInline
 @Serializable(with = GreedyStringSerializer::class)
-public value class GreedyString(public val value: String)
+public value class GreedyString(public val value: String) {
+    override fun toString(): String {
+        return value
+    }
+}
 
 private class GreedyStringSerializer : CommandSerializer<GreedyString> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("GreedyString", PrimitiveKind.STRING)

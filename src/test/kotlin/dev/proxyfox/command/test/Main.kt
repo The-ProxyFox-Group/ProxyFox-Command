@@ -1,41 +1,63 @@
 package dev.proxyfox.command.test
 
 import dev.proxyfox.command.*
+import dev.proxyfox.command.types.CommandSerializer
 import dev.proxyfox.command.types.GreedyString
 import dev.proxyfox.command.types.UnixList
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
-@Serializable
-data class Test(
-    val test: String,
-    val uwu: Int?,
-    val owo: TestInner
-)
+@JvmInline
+@Serializable(with = ValidatedStringSerializer::class)
+value class ValidatedString(val value: String) {
+    fun validate(): Boolean {
+        if (value.length > 5) return false
+        return value.isNotEmpty()
+    }
+}
 
-@Serializable
-data class TestInner(
-    val nya: UnixList,
-)
+class ValidatedStringSerializer : CommandSerializer<ValidatedString> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("ValidatedString", PrimitiveKind.STRING)
 
-@LiteralArgument("nya")
-object TestCommandGroup {
+    override fun decodeCommand(decoder: CommandDecoder): ValidatedString {
+        decoder.cursor.checkout()
+        val value = ValidatedString(decoder.decodeString())
+        if (!value.validate()) {
+            decoder.cursor.rollback()
+            decoder.fails()
+        }
+        decoder.cursor.commit()
+        return value
+    }
+
+    override fun decodeRegular(decoder: Decoder): ValidatedString = ValidatedString(decoder.decodeString())
+
+    override fun serialize(encoder: Encoder, value: ValidatedString) {
+        encoder.encodeString(value.value)
+    }
+}
+
+@LiteralArgument("member", "mem", "m")
+object MemberCommands {
     @Command
     suspend fun test(
         @Context ctx: CommandContext<Any>,
-        @LiteralArgument("owo", "uwu") _literal: Unit,
-        owo: String,
-        uwu: UnixList,
-        nya: GreedyString
+        member: ValidatedString,
+        @LiteralArgument("name", "n") literal_name: Unit,
+        name: String
     ) {
-        println("Input: ${ctx.command}")
-        println(owo)
-        println(uwu)
-        println(nya)
+        println(member)
+        println(name)
     }
 }
 
 suspend fun main() {
     val parser = CommandParser<String, StringContext>()
-    parser += TestCommandGroup
-    parser.parse(StringContext("nya owo uwu -awoo --arf 15 nya"))
+    parser += MemberCommands
+    println(parser.parse(StringContext("m owo n uwu")))
+    println(parser.parse(StringContext("m owowowo n uwu")))
 }

@@ -1,18 +1,29 @@
 package dev.proxyfox.command
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import kotlin.reflect.KFunction
 
 public class CommandParser<T, C: CommandContext<T>> {
-    public suspend fun parse(ctx: C): Boolean {
-        for (function in functionMembers)
-            if (function.parseFunc(ctx))
-                return true
+    public suspend fun parse(ctx: C): Either<Unit, List<ParseError>> {
+        val errors = ArrayList<ParseError>()
 
-        for (clazz in classMembers)
-            if (clazz.parse(ctx))
-                return true
+        for (function in functionMembers) {
+            val result = function.parseFunc(ctx)
+            if (result.isLeft())
+                return Unit.left()
+            errors.add(result.getOrNull()!!)
+        }
 
-        return false
+        for (clazz in classMembers) {
+            val result = clazz.parse(ctx)
+            if (result.isLeft())
+                return Unit.left()
+            errors.addAll(result.getOrNull()!!)
+        }
+        errors.sortBy { -it.ordinal }
+        return errors.right()
     }
 
     private val classMembers = ArrayList<Any>()

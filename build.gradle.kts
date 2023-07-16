@@ -20,6 +20,7 @@ kotlin {
 dependencies {
     implementation(kotlin("reflect"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
+    implementation("io.arrow-kt:arrow-core:1.2.0")
 }
 
 tasks.withType<KotlinCompile> {
