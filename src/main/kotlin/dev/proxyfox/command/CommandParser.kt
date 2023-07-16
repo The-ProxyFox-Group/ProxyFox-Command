@@ -1,68 +1,37 @@
 package dev.proxyfox.command
 
-import dev.proxyfox.command.node.CommandNode
-import dev.proxyfox.command.node.builtin.LiteralNode
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
+import kotlin.reflect.KFunction
 
-public class CommandParser<T, C: CommandContext<T>>: NodeHolder<T, C>() {
-    public suspend fun parse(ctx: C): Boolean? {
-        val literals = ArrayList<LiteralNode<T, C>>()
-        val cursor = StringCursor(ctx.command)
-        for (node in nodes) {
-            if (node is LiteralNode) literals.add(node)
-            cursor.checkout()
-            val parsed = tryParseNode(cursor, node, ctx)
-            if (parsed == null) {
-                cursor.rollback()
-                continue
-            }
-            cursor.commit()
-            return parsed
+public class CommandParser<T, C: CommandContext<T>> {
+    public suspend fun parse(ctx: C): Either<Unit, List<ParseError>> {
+        val errors = ArrayList<ParseError>()
+
+        for (function in functionMembers) {
+            val result = function.parseFunc(ctx)
+            if (result.isLeft())
+                return Unit.left()
+            errors.add(result.getOrNull()!!)
         }
-        val test = ctx.command.split(" ")[0]
-        val closest = getLevenshtein(test, literals) ?: return null
-        if (closest.second == 0) return null
-        ctx.respondFailure("Command `$test` not found. Did you mean `${closest.first}`? Closeness: ${closest.second}")
-        return false
+
+        for (clazz in classMembers) {
+            val result = clazz.parse(ctx)
+            if (result.isLeft())
+                return Unit.left()
+            errors.addAll(result.getOrNull()!!)
+        }
+        errors.sortBy { -it.ordinal }
+        return errors.right()
     }
 
-    private suspend fun tryParseNode(cursor: StringCursor, node: CommandNode<T, C>, ctx: C): Boolean? {
-        // Try parsing the node
-        val parsed = node.parse(cursor, ctx)
-        // Return if parsing failed or there's no string left to consume
-        if (!parsed) return null
-        // Iterate through sub nodes and try parsing them
-        val literals = ArrayList<LiteralNode<T, C>>()
-        for (subNode in node.nodes) {
-            if (subNode is LiteralNode) literals.add(subNode)
-            cursor.checkout()
-            val parsed = tryParseNode(cursor, subNode, ctx)
-            if (parsed == null) {
-                cursor.rollback()
-                continue
-            }
-            cursor.commit()
-            return parsed
-        }
-        if (cursor.end) return node.execute(ctx)
-        val test = cursor.extractString(allowQuotes = false)
-        val closest = getLevenshtein(test, literals) ?: return node.execute(ctx)
-        if (closest.second == 0) return node.execute(ctx)
-        ctx.respondFailure("Command `$test` not found. Did you mean `${closest.first}`?")
-        return false
-    }
+    private val classMembers = ArrayList<Any>()
+    private val functionMembers = ArrayList<KFunction<Any>>()
 
-    private fun getLevenshtein(test: String, literals: ArrayList<LiteralNode<T, C>>): Pair<String, Int>? {
-        var closest: Pair<String, Int>? = null
-        for (literal in literals) {
-            for (str in literal.literals) {
-                val dist = test.levenshtein(str)
-                if (closest == null) {
-                    closest = Pair(str, dist)
-                } else if (closest.second > dist) {
-                    closest = Pair(str, dist)
-                }
-            }
-        }
-        return closest
+    public operator fun plusAssign(value: Any) {
+        if (value is KFunction<*>)
+            functionMembers.add(value as KFunction<Any>)
+        else classMembers.add(value)
     }
 }

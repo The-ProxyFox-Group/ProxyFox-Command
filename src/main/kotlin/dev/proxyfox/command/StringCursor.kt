@@ -4,7 +4,8 @@ import java.util.ArrayList
 import kotlin.math.abs
 
 public class StringCursor(public val command: String) {
-    private var index = 0
+    public var index: Int = 0
+        private set
 
     public val beginning: Boolean get() = index <= 0
     public val end: Boolean get() = index >= command.length
@@ -36,7 +37,6 @@ public class StringCursor(public val command: String) {
         return this
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     public operator fun plusAssign(amount: Int) {
         for (i in 0..<abs(amount)) {
             if (amount > 0) inc()

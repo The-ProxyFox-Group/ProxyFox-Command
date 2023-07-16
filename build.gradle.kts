@@ -1,12 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.8.10"
+    kotlin("jvm") version "1.9.0"
+    kotlin("plugin.serialization") version "1.9.0"
     `maven-publish`
 }
 
 group = "dev.proxyfox"
-version = "1.8"
+version = "2.0"
 
 repositories {
     mavenCentral()
@@ -17,6 +18,9 @@ kotlin {
 }
 
 dependencies {
+    implementation(kotlin("reflect"))
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
+    implementation("io.arrow-kt:arrow-core:1.2.0")
 }
 
 tasks.withType<KotlinCompile> {
