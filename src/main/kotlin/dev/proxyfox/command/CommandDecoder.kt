@@ -15,7 +15,7 @@ public inline fun <reified T> decode(cursor: StringCursor, context: CommandConte
 public inline fun <reified T> decode(cursor: StringCursor, context: CommandContext<Any>): T =
     decode(cursor, context, serializer())
 
-public class CommandDecoder(private val cursor: StringCursor, public val context: CommandContext<Any>) : AbstractDecoder() {
+public class CommandDecoder(public val cursor: StringCursor, public val context: CommandContext<Any>) : AbstractDecoder() {
     private var elementsCount = 0
 
     override val serializersModule: SerializersModule = EmptySerializersModule()
