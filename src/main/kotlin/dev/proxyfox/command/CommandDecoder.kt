@@ -9,6 +9,7 @@ import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
 
 public class CommandDecodingException(idx: Int) : Exception("Cannot decode command at $idx")
+public class CommandValidationException(public val idx: Int, public val reason: String) : Exception("Cannot decode command at $idx: $reason")
 
 public inline fun <reified T> decode(cursor: StringCursor, context: CommandContext<Any>, serializer: KSerializer<T>): T =
     CommandDecoder(cursor, context).decodeSerializableValue(serializer)
@@ -21,6 +22,7 @@ public class CommandDecoder(public val cursor: StringCursor, public val context:
     override val serializersModule: SerializersModule = EmptySerializersModule()
 
     public fun fails(): Nothing = throw CommandDecodingException(cursor.index)
+    public fun fails(reason: String): Nothing = throw CommandValidationException(cursor.index, reason)
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
         if (elementsCount == descriptor.elementsCount) return CompositeDecoder.DECODE_DONE

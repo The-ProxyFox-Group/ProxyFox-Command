@@ -28,7 +28,7 @@ class ValidatedStringSerializer : CommandSerializer<ValidatedString> {
         val value = ValidatedString(decoder.decodeString())
         if (!value.validate()) {
             decoder.cursor.rollback()
-            decoder.fails()
+            decoder.fails("string not within 0-5 characters")
         }
         decoder.cursor.commit()
         return value

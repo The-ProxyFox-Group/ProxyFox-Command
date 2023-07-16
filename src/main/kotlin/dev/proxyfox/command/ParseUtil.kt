@@ -8,14 +8,15 @@ import kotlin.reflect.*
 import kotlin.reflect.full.callSuspendBy
 import kotlin.reflect.full.functions
 
-public class ParseError(
+public data class ParseError(
     public val function: KFunction<Any>,
     public val ordinal: Int,
     public val parameter: KParameter?,
+    public val validationException: CommandValidationException?
 ) {
     override fun toString(): String =
         if (parameter != null)
-            "${function.name}[$ordinal]:${parameter.name}"
+            "${function.name}[$ordinal]:${parameter.name}${validationException?.let { " -> ${it.reason}" } ?: ""}"
         else "${function.name}[$ordinal]"
 
     public companion object {
@@ -37,7 +38,7 @@ public suspend fun <T, C : Any> C.parse(context: CommandContext<T>): Either<Unit
 }
 
 public suspend fun <T, F: KFunction<R>, R> F.parseFunc(context: CommandContext<T>, base: Any? = null): Either<Unit, ParseError> {
-    annotations.find { it is Command } ?: return ParseError(this as KFunction<Any>, ParseError.NOT_COMMAND, null).right()
+    annotations.find { it is Command } ?: return ParseError(this as KFunction<Any>, ParseError.NOT_COMMAND, null, null).right()
 
     val cursor = StringCursor(context.command)
 
@@ -46,7 +47,7 @@ public suspend fun <T, F: KFunction<R>, R> F.parseFunc(context: CommandContext<T
     if (base != null) {
         val arg = base::class.annotations.find { it is LiteralArgument } as? LiteralArgument
         if (arg != null && arg.getLiteral(cursor) == null) {
-            return ParseError(this as KFunction<Any>, ParseError.ROOT_LITERAL_NOT_MATCH, null).right()
+            return ParseError(this as KFunction<Any>, ParseError.ROOT_LITERAL_NOT_MATCH, null, null).right()
         }
     }
 
@@ -62,7 +63,7 @@ public suspend fun <T, F: KFunction<R>, R> F.parseFunc(context: CommandContext<T
         }
         val literal = parameter.annotations.find { it is LiteralArgument } as? LiteralArgument?
         if (literal != null) {
-            literal.getLiteral(cursor) ?: return ParseError(this as KFunction<Any>, i, parameter).right()
+            literal.getLiteral(cursor) ?: return ParseError(this as KFunction<Any>, i, parameter, null).right()
             map[parameter] = Unit
             continue
         }
@@ -71,7 +72,9 @@ public suspend fun <T, F: KFunction<R>, R> F.parseFunc(context: CommandContext<T
         } catch (err: CommandDecodingException) {
             if (parameter.isOptional || parameter.type.isMarkedNullable)
                 null
-            else return ParseError(this as KFunction<Any>, i, parameter).right()
+            else return ParseError(this as KFunction<Any>, i, parameter, null).right()
+        } catch (err: CommandValidationException) {
+            return ParseError(this as KFunction<Any>, i, parameter, err).right()
         }
         map[parameter] = value
         if (value != null)
