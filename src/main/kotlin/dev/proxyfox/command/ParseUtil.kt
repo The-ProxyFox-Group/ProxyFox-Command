@@ -4,9 +4,12 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import kotlinx.serialization.serializer
-import kotlin.reflect.*
+import kotlin.reflect.KFunction
+import kotlin.reflect.KParameter
 import kotlin.reflect.full.callSuspendBy
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.functions
+import kotlin.reflect.full.hasAnnotation
 
 public data class ParseError(
     public val function: KFunction<Any>,
@@ -26,6 +29,10 @@ public data class ParseError(
 
 public suspend fun <T, C : Any> C.parse(context: CommandContext<T>): Either<Unit, List<ParseError>> {
     val functions = this::class.functions
+        .asSequence()
+        .filter { it.hasAnnotation<Command>() }
+        .sortedByDescending { it.parameters.size }
+        .sortedByDescending { it.findAnnotation<Command>()!!.priority }
     val errors = ArrayList<ParseError>()
     for (function in functions) {
         val result = function.parseFunc(context, this)

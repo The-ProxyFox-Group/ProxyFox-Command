@@ -1,7 +1,7 @@
 package dev.proxyfox.command
 
 @Target(AnnotationTarget.FUNCTION)
-public annotation class Command
+public annotation class Command(public val priority: Int = 0)
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER)
 public annotation class LiteralArgument(public vararg val values: String)
