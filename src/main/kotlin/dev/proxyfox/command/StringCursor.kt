@@ -1,6 +1,5 @@
 package dev.proxyfox.command
 
-import java.util.ArrayList
 import kotlin.math.abs
 
 public class StringCursor(public val command: String) {
@@ -75,5 +74,9 @@ public class StringCursor(public val command: String) {
             inc()
         }
         return out
+    }
+
+    override fun toString(): String {
+        return "StringCursor(command='$command', index=$index, positions=$positions)"
     }
 }

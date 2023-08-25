@@ -19,7 +19,7 @@ public data class ParseError(
     public val exception: CommandDecodingException?
 ) {
     override fun toString(): String =
-        "${rootLiteral?.values?.let { "$it " } ?: ""}${function.name}[$ordinal]${parameter?.name.let {": $it"} ?: ""}${exception?.let { " -> ${it.reason}" } ?: ""}"
+        "${rootLiteral?.values?.let { "${it.contentToString()} " } ?: ""}${function.name}[$ordinal]${parameter?.name.let { ": $it" }}${exception?.let { " -> ${it.reason}" } ?: ""}"
 
     public companion object {
         public const val NOT_COMMAND: Int = -2
