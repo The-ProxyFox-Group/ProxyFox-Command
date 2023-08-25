@@ -27,7 +27,9 @@ public data class ParseError(
     }
 }
 
-public suspend fun <T, C : Any> C.parse(context: CommandContext<T>): Either<Unit, List<ParseError>> {
+public typealias CompletionStruct = Pair<Boolean, List<ParseError>>
+
+public suspend fun <T, C : Any> C.parse(context: CommandContext<T>): CompletionStruct {
     val functions = this::class.functions
         .asSequence()
         .filter { it.hasAnnotation<Command>() }
@@ -36,11 +38,12 @@ public suspend fun <T, C : Any> C.parse(context: CommandContext<T>): Either<Unit
     val errors = ArrayList<ParseError>()
     for (function in functions) {
         val result = function.parseFunc(context, this)
-        if (result.isLeft())
-            return Unit.left()
+        if (result.isLeft()) {
+            return (true to errors)
+        }
         errors.add(result.getOrNull()!!)
     }
-    return errors.right()
+    return (false to errors)
 }
 
 public suspend fun <T, F: KFunction<R>, R> F.parseFunc(context: CommandContext<T>, base: Any? = null): Either<Unit, ParseError> {
