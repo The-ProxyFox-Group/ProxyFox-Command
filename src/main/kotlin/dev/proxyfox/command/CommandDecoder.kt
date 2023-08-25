@@ -143,7 +143,9 @@ public class CommandDecoder(public val cursor: StringCursor, public val context:
     }
 
     override fun decodeNotNullMark(): Boolean {
-        return false
+        // It's likely not null if there's more data.
+        // However, if there are not any more data, then it is considered null.
+        return !cursor.end
     }
 
     override fun <T : Any> decodeNullableSerializableValue(deserializer: DeserializationStrategy<T?>): T? {
